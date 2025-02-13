@@ -1,0 +1,118 @@
+{% extends 'base.html'%}
+{% load static %}
+
+{% block page_title %}
+Home
+{% endblock page_title %}
+
+{% block content %}
+
+<div class="container-fluid py-3">
+    <div class="row py-2">
+        <div class="col-sm-4 mb-2 mb-sm-0">
+            <div class="card bg-light text-dark">
+                <div class="card-body" data-weekday="2">
+                    <h5 class="card-title">Segunda-feira</h5>
+                    
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-4">
+            <div class="card bg-info text-dark bg-opacity-25">
+                <div class="card-body" data-weekday="3">
+                    <h5 class="card-title">Terça-feira</h5>
+                    
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-4">
+            <div class="card bg-info text-dark bg-opacity-10">
+                <div class="card-body" data-weekday="4">
+                    <h5 class="card-title">Quarta-feira</h5>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row py-2">
+        <div class="col-sm-4">
+            <div class="card bg-success text-dark bg-opacity-25">
+                <div class="card-body" data-weekday="5">
+                    <h5 class="card-title">Quinta-feira</h5>
+                    
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-4">
+            <div class="card bg-success text-dark bg-opacity-10">
+                <div class="card-body" data-weekday="6">
+                    <h5 class="card-title">Sexta-feira</h5>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-4">
+            <div class="card bg-success bg-danger-subtle text-danger-emphasis">
+                <div class="card-body" data-weekday="7">
+                    <h5 class="card-title">Sábado</h5>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row py-2">
+        <div class="col-sm-4">
+            <div class="card bg-warning-subtle text-warning-emphasis">
+                <div class="card-body" data-weekday="1">
+                    <h5 class="card-title">Domingo</h5>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-8">
+            <div class="card bg-secondary-subtle text-secondary-emphasis">
+                <div class="card-body" data-weekday="9">
+                    <h5 class="card-title">Importante!!!</h5>
+                    {% if anotacao %}
+                    <h6 class="card-subtitle mb-2 text-body-secondary">{{anotacao.titulo}}</h6>
+                    <p class="card-text">{{anotacao.texto}}</p>
+                        {% if anotacao.concluido %}
+                    <p><i class="fa-regular fa-square-check"></i> Concluído!</p>
+                        {% else %}
+                    <div class="col-sm-4">
+                        <label class="form-check-label" for="anotacao_{{anotacao.pk}}">
+                            Concluído
+                        </label>
+                    </div>
+                        {% endif %}
+                    {% endif %}
+                </div>
+            </div>        
+        </div>
+    </div>
+</div>
+
+{% endblock content %}
+
+{% block javascript %}
+<script>
+   function loadTaskList(div){
+    endpoint = '{% url "task_list" 9 %}'
+    weekday = $(div).data('weekday')
+    if (weekday == '9') return; // é anotação
+    endpoint = endpoint.replace('9', weekday)
+    $.ajax({
+        url: endpoint,
+        method: "GET",
+        dataType: "html"
+    }).done(function(data){
+        $(div).append(data)
+    }).fail(function(error){
+        alert('Algo deu errado...')
+        console.log(error)
+    });
+   }
+   
+   $(document).ready(function() {
+        $('div.card-body').each(function(){
+            loadTaskList(this)
+        })
+    })
+</script>
+{% endblock javascript %}
