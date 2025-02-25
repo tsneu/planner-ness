@@ -1,12 +1,17 @@
 {% if cronograma %}
-<h6 class="card-subtitle mb-2 text-body-secondary">{{cronograma.titulo}}</h6>
-<p class="card-text">{{cronograma.texto}}</p>
+<h6 class="card-subtitle mb-2 text-body-secondary">
+    <span class="fst-italic">{{cronograma.data|date:'d/M'}}</span> - {{cronograma.titulo}}
+</h6>
+    {% if cronograma.texto %}<p class="card-text">{{cronograma.texto}}</p>{% endif%}
     {% if atividades %}
         {% for a in atividades %}
     <div class="form-check">
-        <input class="form-check-input" type="checkbox" value="" name="realizado" data-id="{{a.pk}}" id="{{a.pk}}" {% if a.realizado %} checked disabled {% endif %}>
-        <label class="form-check-label" for="ativ_{{a.pk}}">            
-            {{a.horario}} {{a.periodo}} - {{a.descricao}} {{a.local__nome}} {{a.user__username}}
+        <input class="form-check-input" type="checkbox" value="{{a.pk}}" name="tarefa" id="task_{{a.pk}}" {% if a.realizado %} checked disabled {% endif %}>
+        <label class="form-check-label" for="ativ_{{a.pk}}">
+            {% if a.horario %}{{a.horario}} {% else %} {{a.get_periodo_display}} {% endif %}
+             - <i class="{{a.categoria.icone}}"></i> {{a.descricao}} <br>
+            Local: <i class="{{a.local.icone}}"></i> {{a.local.nome}}
+            Quem: <i class="fa-regular fa-face-smile"></i> {{a.user.username}}
         </label>
     </div>
         {% endfor %}

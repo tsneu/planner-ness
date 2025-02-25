@@ -7,6 +7,12 @@ Home
 
 {% block content %}
 
+<form method="post" action="{% url 'form_plan_post' %}">
+    {% csrf_token %}
+<div class="row">
+    <div class="col-6"><p class="lead">Pense simples. Simplifique, não complique.</p></div>
+    <div class="col-6"><button type="submit" class="btn btn-light">Salvar e atualizar agenda</button></div>
+</div>
 <div class="container-fluid py-3">
     <div class="row py-2">
         <div class="col-sm-4 mb-2 mb-sm-0">
@@ -68,33 +74,33 @@ Home
         <div class="col-sm-8">
             <div class="card bg-secondary-subtle text-secondary-emphasis">
                 <div class="card-body" data-weekday="9">
-                    <h5 class="card-title">Importante!!!</h5>
-                    {% if anotacao %}
-                    <h6 class="card-subtitle mb-2 text-body-secondary">{{anotacao.titulo}}</h6>
-                    <p class="card-text">{{anotacao.texto}}</p>
-                        {% if anotacao.concluido %}
-                    <p><i class="fa-regular fa-square-check"></i> Concluído!</p>
+                    <h5 class="card-title">Na semana...</h5>
+                    {% for nota in anotacao %}
+                    <h6 class="card-subtitle mb-2 text-body-secondary">{{nota.titulo}}</h6>
+                    <p class="card-text">
+                        {% if nota.concluido %}
+                        <i class="fa-regular fa-square-check"></i> {{nota.texto}}
                         {% else %}
-                    <div class="col-sm-4">
+                        <input class="form-check-input" type="checkbox" value="{{nota.id}}" name="anotacao" id="nota_{{nota.pk}}">
                         <label class="form-check-label" for="anotacao_{{anotacao.pk}}">
-                            Concluído
+                            {{nota.texto}}
                         </label>
-                    </div>
                         {% endif %}
-                    {% endif %}
+                    </p>
+                    {% endfor %}
                 </div>
             </div>        
         </div>
     </div>
 </div>
-
+</form>
 {% endblock content %}
 
 {% block javascript %}
 <script>
    function loadTaskList(div){
-    endpoint = '{% url "task_list" 9 %}'
-    weekday = $(div).data('weekday')
+    let endpoint = '{% url "task_list" 9 %}'
+    let weekday = $(div).data('weekday')
     if (weekday == '9') return; // é anotação
     endpoint = endpoint.replace('9', weekday)
     $.ajax({

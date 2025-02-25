@@ -33,6 +33,7 @@ class Categoria(models.Model):
     nome = models.CharField(max_length=30)
     sigla = models.CharField(max_length=10)
     descricao = models.CharField(max_length=255)
+    icone = models.CharField(max_length=255, null=True, blank=True)
 
     def __str__(self):
         return self.nome
@@ -42,6 +43,7 @@ class Local(models.Model):
     nome = models.CharField(max_length=30)
     sigla = models.CharField(max_length=10)
     descricao = models.CharField(max_length=255)
+    icone = models.CharField(max_length=255, null=True, blank=True)
 
     def __str__(self):
         return self.nome
@@ -69,6 +71,7 @@ class Atividade(models.Model):
     }
     cronograma = models.ForeignKey(Cronograma, on_delete=models.DO_NOTHING)
     descricao = models.CharField(max_length=255)
+    categoria = models.ForeignKey(Categoria, on_delete=models.DO_NOTHING, null=True, blank=True)
     periodo = models.CharField(max_length=2, choices=PERIODO_CHOICES, null=True, blank=True)
     horario = models.TimeField(null=True, blank=True)
     realizado = models.BooleanField(default=False)
@@ -91,16 +94,15 @@ class Compra(models.Model):
 
 
 class Anotacao(models.Model):
-    ano = models.SmallIntegerField()
-    semana = models.SmallIntegerField()
     titulo = models.CharField(max_length=100)
     texto = models.CharField(max_length=255)
     concluido = models.BooleanField(default=False)
+    data = models.DateField(help_text='Adicione qualquer data dentro da semana desejada.')
 
     class Meta:
         verbose_name = "anotação"
         verbose_name_plural = "anotações"
-        ordering = ["-ano", "-semana"]
+        ordering = ["-data"]
 
     def __str__(self):
         return self.titulo

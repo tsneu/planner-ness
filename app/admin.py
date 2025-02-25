@@ -17,31 +17,52 @@ class ProdutoView(admin.ModelAdmin):
 
 @admin.register(models.Categoria)
 class CategoriaView(admin.ModelAdmin):
-    list_display = ['nome', 'sigla', 'descricao']
+    list_display = ['nome', 'sigla', 'descricao', 'icone']
 
 
 @admin.register(models.Anotacao)
 class AnotacaoView(admin.ModelAdmin):
-    list_display = ['ano', 'periodo', 'titulo', 'concluido']
+    list_display = ['periodo', 'titulo', 'concluido']    
 
     @admin.display()
     def periodo(self, obj):
-        dtini = date.fromisocalendar(year=obj.ano, week=obj.semana, day=0)
-        dtfim = date.fromisocalendar(year=obj.ano, week=obj.semana, day=6)
+        dt = obj.data
+        week = dt.isocalendar()[1]
+        dtini = date.fromisocalendar(year=dt.year, week=week, day=1)
+        dtfim = date.fromisocalendar(year=dt.year, week=week, day=7)
         return f'{dtini.strftime('%d/%m/%Y')} a {dtfim.strftime('%d/%m/%Y')}'
+
+
 
 
 @admin.register(models.Local)
 class LocalView(admin.ModelAdmin):
-    list_display = ['nome', 'sigla']
+    list_display = ['nome', 'sigla', 'icone']
 
 
 @admin.register(models.Cronograma)
 class CronogramaView(admin.ModelAdmin):
-    list_display = ['data', 'titulo']
+    list_display = ['data', 'dia', 'titulo']
+
+    @admin.display()
+    def dia(self, obj):
+        dt = obj.data
+        return f'{dt.strftime('%A')}'
+
 
 
 @admin.register(models.Atividade)
 class AtividadeView(admin.ModelAdmin):
-    list_display = ['cronograma', 'descricao', 'local', 'periodo', 'horario']
+    list_display = ['cronograma','dia', 'descricao', 'realizado', 'local', 'periodo', 'horario']
+    list_filter = ['cronograma__data', 'local', 'categoria']
+    actions = ['marcar_renovado', ]
     
+    @admin.display()
+    def dia(self, obj):
+        dt = obj.cronograma.data
+        return f'{dt.strftime('%A')}'
+
+    @admin.action(description='Marcar como realizado')
+    def marcar_renovado(self, request, queryset):
+        res = queryset.update(realizado=True)
+        self.message_user(request, 'Atualizado {} atividade(s).'.format(res))
