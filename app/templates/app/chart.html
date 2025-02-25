@@ -1,0 +1,227 @@
+{% extends 'base.html'%}
+{% load static %}
+
+{% block page_title %}
+Home
+{% endblock page_title %}
+
+{% block content %}
+<div class="row py-2">
+    <div class="col-6"><canvas id="chart_ano"></canvas></div>
+    <div class="col-6"><canvas id="chart_dia_semana"></canvas></div>
+    <div class="col-6"><canvas id="chart_categoria"></canvas> </div>
+    <div class="col-6" style="height: 350px;"><canvas id="chart_local"></canvas></div>
+</div>
+
+{% endblock content %}
+
+{% block javascript %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+
+const BORDER_COLORS = {
+  red: 'rgb(255, 99, 132)',
+  orange: 'rgb(255, 159, 64)',
+  yellow: 'rgb(255, 205, 86)',
+  green: 'rgb(75, 192, 192)',
+  blue: 'rgb(54, 162, 235)',
+  purple: 'rgb(153, 102, 255)',
+  grey: 'rgb(201, 203, 207)'
+};
+
+const BG_COLORS = {
+    red: 'rgba(255, 99, 132, 0.2)',
+    orange: 'rgba(255, 159, 64, 0.2)',
+    yellow: 'rgba(255, 205, 86, 0.2)',
+    green: 'rgba(75, 192, 192, 0.2)',
+    blue: 'rgba(54, 162, 235, 0.2)',
+    purple: 'rgba(153, 102, 255, 0.2)',
+    gray: 'rgba(201, 203, 207, 0.2)'
+};
+
+// atividades no ano - mensalmente
+const lb_meses = {% autoescape off %}{{ds_ano_labels}}{% endautoescape %};
+
+const dt_ano = {
+  labels: lb_meses,
+  datasets: [
+    {
+      label: 'Realizados',
+      data: {{ds_ano_realizado}},
+      borderColor: BORDER_COLORS.blue,
+      backgroundColor: BG_COLORS.blue,
+      borderWidth: 2,
+      borderRadius: Number.MAX_VALUE,
+      borderSkipped: false,
+    },
+    {
+      label: 'Não realizados',
+      data: {{ds_ano_nao_realizado}},
+      borderColor: BORDER_COLORS.red,
+      backgroundColor: BG_COLORS.red,
+      borderWidth: 2,
+      borderRadius: 5,
+      borderSkipped: false,
+    }
+  ]
+};
+const config_ano = {
+  type: 'bar',
+  data: dt_ano,
+  options: {
+    responsive: true,
+    plugins: {
+      legend: {
+        position: 'top',
+      },
+      title: {
+        display: true,
+        text: 'Atividades - mensal'
+      }
+    }
+  },
+};
+
+const chart_ano = document.getElementById('chart_ano')
+new Chart(chart_ano, config_ano);
+
+// atividades no ano - dias da semana
+
+const lb_dias_sem = {% autoescape off %}{{ds_dia_labels}}{% endautoescape %};
+
+const dt_dias_sem = {
+  labels: lb_dias_sem,
+  datasets: [
+    {
+      label: 'Realizados',
+      data: {{ds_dia_realizado}},
+      borderColor: BORDER_COLORS.orange,
+      backgroundColor: BG_COLORS.orange,
+      borderWidth: 2,
+      borderRadius: Number.MAX_VALUE,
+      borderSkipped: false,
+    },
+    {
+      label: 'Não realizados',
+      data: {{ds_dia_nao_realizado}},
+      borderColor: BORDER_COLORS.purple,
+      backgroundColor: BG_COLORS.purple,
+      borderWidth: 2,
+      borderRadius: 5,
+      borderSkipped: false,
+    }
+  ]
+};
+const config_dias_sem = {
+  type: 'bar',
+  data: dt_dias_sem,
+  options: {
+    responsive: true,
+    plugins: {
+      legend: {
+        position: 'top',
+      },
+      title: {
+        display: true,
+        text: 'Atividades - dias da semana'
+      }
+    }
+  },
+};
+
+const chart_dia_semana = document.getElementById('chart_dia_semana')
+new Chart(chart_dia_semana, config_dias_sem);
+
+// categorias
+const lb_categoria = {% autoescape off %}{{ds_categoria_labels}}{% endautoescape %};
+
+const dt_categoria = {
+  labels: lb_categoria,
+  datasets: [
+    {
+      label: 'Realizados',
+      data: {{ds_categoria_realizado}},
+      borderColor: BORDER_COLORS.green,
+      backgroundColor: BG_COLORS.green,
+      borderWidth: 2,
+      borderRadius: Number.MAX_VALUE,
+      borderSkipped: false,
+    },
+    {
+      label: 'Não realizados',
+      data: {{ds_categoria_nao_realizado}},
+      borderColor: BORDER_COLORS.yellow,
+      backgroundColor: BG_COLORS.yellow,
+      borderWidth: 2,
+      borderRadius: 5,
+      borderSkipped: false,
+    }
+  ]
+};
+const config_categoria = {
+  type: 'bar',
+  data: dt_categoria,
+  options: {
+    indexAxis: 'y',
+    responsive: true,
+    plugins: {
+      legend: {
+        position: 'top',
+      },
+      title: {
+        display: true,
+        text: 'Atividades - categorias [{{mes_atual|date:"F"}}]'
+      }
+    },
+    scales: {
+      x: {
+        stacked: true,
+      },
+      y: {
+        stacked: true
+      }
+    }
+  },
+};
+
+const chart_categoria = document.getElementById('chart_categoria')
+new Chart(chart_categoria, config_categoria);
+
+// locais - atual (mês)
+
+const lb_local = {% autoescape off %}{{ds_local_labels}}{% endautoescape %};
+
+const dt_local = {
+  labels: lb_local,
+  datasets: [
+    {
+      label: 'Locais',
+      data: {{ds_local}},
+      backgroundColor: {% autoescape off %}{{bg_colors}}{% endautoescape %},
+    }
+  ]
+};
+const config_local = {
+  type: 'pie',
+  data: dt_local,
+  options: {
+    responsive: true,
+    plugins: {
+      legend: {
+        position: 'left',
+      },
+      title: {
+        display: true,
+        text: 'Atividades - locais [{{mes_atual|date:"F"}}]'
+      }
+    }
+  },
+};
+
+const chart_local = document.getElementById('chart_local')
+new Chart(chart_local, config_local);
+
+
+</script>
+{% endblock javascript %}
